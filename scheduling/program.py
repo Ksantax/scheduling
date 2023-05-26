@@ -1,6 +1,8 @@
+# Модуль дле тестовых запусков. Возможно, потом это
+# всё превратится в API или останется на какое-то время просто
+# модулем для запуска как программы
+
 import json
-from pathlib import Path
-import os
 
 from pydantic import parse_obj_as
 
@@ -30,15 +32,15 @@ config = load_config()
 alg = GeneticAlgorithm(config)
 alg.init_population()
 try:
-    alg.start_algorithm(NUMBER_OF_ITERATIONS, 
-            change_interval=100, verbose=True,
+    alg.start_algorithm(NUMBER_OF_ITERATIONS,
+            verbose_interval=100,
             save_file_name=POP_FILE_NAME)
 except KeyboardInterrupt:
     pass
 finally:
-    best = alg.hof.items[0]
-    print('='*20, alg.task.evaluate(best), '='*20, sep='\n')
-    result = [i.dict() for i in alg.task.individ_to_schedule(best)]
+    best = alg.hof[0]
+    alg.evaluator.print_errors(best)
+    result = [i.dict() for i in alg.task.individual_to_schedule(best)]
     with open(RESULT_DIR / RESULT_FILE_NAME, 'w+', encoding='utf-8') as file:
         json.dump(result, file, ensure_ascii=False, indent=4)
     print('saved to ' + RESULT_FILE_NAME)
